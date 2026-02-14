@@ -6,4 +6,3 @@ auth_router = APIRouter(prefix="/auth", tags=["auth"])
 async def autenticar():
     return {"message": "Voçe acessou a rota de autenticação"}
 
-sq

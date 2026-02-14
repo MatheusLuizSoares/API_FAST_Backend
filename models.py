@@ -31,18 +31,18 @@ class Usuario(Base):
 #pedido
 class Pedido(Base):
     __tablename__ = "pedidos"
-    status_pedidos = {
-        "PENDENTE": "PENDENTE",
-        "FINALIZADO": "FINALIZADO",
-        "CANCELADO": "CANCELADO"
-    }
+  #  status_pedidos = {
+   #     "PENDENTE": "PENDENTE",
+    #    "FINALIZADO": "FINALIZADO",
+     #   "CANCELADO": "CANCELADO"
+    #}
 
 
     id = Column("id", Integer, primary_key=True, index=True, autoincrement=True)
     #foreign key para relacionar o pedido com o usuário que fez o pedido
     usuario_id = Column("usuario_id", Integer, ForeignKey("usuarios.id"))
     valor_total = Column("valor_total", Float)
-    status = Column("status", ChoiceType(status_pedidos)) #pendente, pago, cancelado
+    status = Column("status", String) #pendente, pago, cancelado
    
 
     def __init__(self, usuario_id, valor_total, status="PEDENTE"):
