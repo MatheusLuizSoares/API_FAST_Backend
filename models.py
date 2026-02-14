@@ -50,4 +50,18 @@ class Pedido(Base):
         self.status = status
 
 #itenspedido
-                  
+class ItemPedido(Base):
+    __tablename__ = "itens_pedido"
+    id = Column("id", Integer, primary_key=True, index=True, autoincrement=True)
+    pedido_id = Column("pedido_id", Integer, ForeignKey("pedidos.id"))
+    nome_produto = Column("nome_produto", String)
+    quantidade = Column("quantidade", Integer)
+    tamanho = Column("tamanho", String)
+    sabor = Column("sabor", String)
+    preco_unitario = Column("preco_unitario", Float)
+
+    def __init__(self, pedido_id, nome_produto, quantidade, preco_unitario):
+        self.pedido_id = pedido_id
+        self.nome_produto = nome_produto
+        self.quantidade = quantidade
+        self.preco_unitario = preco_unitario                  
