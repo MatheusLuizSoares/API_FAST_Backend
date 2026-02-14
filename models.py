@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Boolean, Float,Fo
 from sqlalchemy.orm import  declarative_base
 from sqlalchemy_utils.types import ChoiceType
 
+
 # cria a conexão com o banco de dados, nesse caso, um banco de dados SQLite chamado "banco.db"
 db = create_engine("sqlite:///banco.db")
 
