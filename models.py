@@ -21,12 +21,13 @@ class Usuario(Base):
     admin = Column("admin", Boolean, default=False)
 
 
-    def __init__(self, nome, email, senha, ativo:True, admin: bool = False):
-        self.nome = nome
-        self.email = email
-        self.senha = senha
-        self.ativo = ativo
-        self.admin = admin
+    def __init__(self, nome, email, senha, ativo=True, admin=False):
+     self.nome = nome
+     self.email = email
+     self.senha = senha
+     self.ativo = ativo
+     self.admin = admin
+
   
 #pedido
 class Pedido(Base):
