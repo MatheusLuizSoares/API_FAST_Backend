@@ -6,6 +6,7 @@ from models import Usuario
 from main import bcrypt_context
 from schemas import UsuarioSchema, loginSchema
 from sqlalchemy.orm import Session
+from jose import JWTError, jwt
 
 #ESSE é o meu prefixo do meu router, ou seja, todas as rotas que eu criar aqui dentro do auth_router vão começar com /auth
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
@@ -13,7 +14,13 @@ auth_router = APIRouter(prefix="/auth", tags=["auth"])
 def criar_token(email)
    token = f""
 
-
+def autenticar_usuario(email, senha, session):
+    usuario = session.query(Usuario).filter(Usuario.email == email).first()
+    if not usuario:
+        return False
+    elif bcrypt_context.verify(senha, usuario.senha) == False:
+        return False
+    return usuario
 
 @auth_router.get("/")
 async def home():
@@ -22,6 +29,8 @@ async def home():
 @auth_router.post("/Registro")
 async def registro(usuario_schema: UsuarioSchema, session: Session = Depends(pegar_sessao)):
     usuario = session.query(Usuario).filter(Usuario.email == usuario_schema.email).first()
+   
+
     if usuario:
         raise HTTPException(status_code=400, detail="Email já cadastrado")
   
@@ -43,7 +52,7 @@ async def registro(usuario_schema: UsuarioSchema, session: Session = Depends(peg
 
 @auth_router.post("/Login")
 async def login(login_schema: loginSchema, session: Session = Depends(pegar_sessao)):
- usuario= session.query(Usuario).filter(Usuario.email == login_schema.email).first()
+ usuario = autenticar_usuario(login_schema.email, login_schema.senha, session)
  if not usuario:
     raise HTTPException(status_code=400, detail="Email ou senha incorretos")
  else:
