@@ -23,7 +23,7 @@ def verificar_token(token: str= Depends(Oath2_schema), session: Session = Depend
   usuario = session.query(Usuario).filter(Usuario.id == id_usuario).first()
   if not usuario:
     raise HTTPException(status_code=401, detail="Usuário não encontrado")
-
+  return id_usuario
 
 ##definir a função pegar_sessao, que é uma função de dependência do FastAPI. Essa função cria uma sessão do banco de dados usando o SQLAlchemy e a retorna para ser usada em outras partes do código. O uso de yield permite que a sessão seja criada e usada em várias rotas, e depois seja fechada automaticamente quando não for mais necessária.
 

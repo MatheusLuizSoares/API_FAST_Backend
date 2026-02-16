@@ -9,14 +9,14 @@ from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 from main import AlgORITHM, Access_TOKEN_EXPIRE_MINUTES, SECRET_KEY
-
+from fastapi.security import OAuth2PasswordRequestForm
 #ESSE é o meu prefixo do meu router, ou seja, todas as rotas que eu criar aqui dentro do auth_router vão começar com /auth
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 def criar_token(id_usuario, duracao_token=timedelta(minutes=Access_TOKEN_EXPIRE_MINUTES)):
     data_expiracao = datetime.now(timezone.utc) + duracao_token
-    dic_info = {"sub": id_usuario, "exp": data_expiracao}
+    dic_info = {"sub": str(id_usuario), "exp": data_expiracao}
     jwt_codificado = jwt.encode(dic_info, SECRET_KEY, algorithm=AlgORITHM)
     return jwt_codificado
 
@@ -70,11 +70,30 @@ async def login(login_schema: loginSchema, session: Session = Depends(pegar_sess
       return {"access_token": access_token, "refresh_token": reflesh_token, "token_type": "bearer"}
  
 
+@auth_router.post("/Login.form")
+async def login_form(dados_formulario: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(pegar_sessao)):
+ usuario = autenticar_usuario(dados_formulario.username, dados_formulario.password, session)
+ if not usuario:
+    raise HTTPException(status_code=400, detail="Email ou senha incorretos")
+ else:
+      access_token = criar_token(usuario.id)
+     
+      return {"access_token": access_token, "token_type": "bearer"}
+ 
 
 @auth_router.get("/refresh")
-async def use_refresh_token(usuario: Usuario = Depends(verificar_token)):
-       access_token = criar_token(usuario.id)
-       return {"access_token": access_token, "token_type": "bearer"}
+async def use_refresh_token(
+    usuario_id: str = Depends(verificar_token),
+    session: Session = Depends(pegar_sessao)
+):
+    usuario = session.query(Usuario).filter(Usuario.id == int(usuario_id)).first()
+
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuário não encontrado")
+
+    access_token = criar_token(usuario.id)
+    return {"access_token": access_token, "token_type": "bearer"}
+
 ##autenticar_usuario é uma função que verifica se um usuário com o email e senha fornecidos existe no banco de dados. Ele consulta o banco de dados para encontrar um usuário com o email fornecido, e se encontrar, verifica se a senha fornecida corresponde à senha armazenada no banco de dados usando a função verify do bcrypt_context. Se o usuário não for encontrado ou a senha não corresponder, a função retorna False. Caso contrário, ela retorna o objeto do usuário autenticado.
 
 
